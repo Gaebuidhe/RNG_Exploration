@@ -1,7 +1,7 @@
 ##############################
 # Created by Dia the GM
 #
-#
+# https://github.com/Gaebuidhe/RNG_Exploration
 ##############################
 
 import pandas as pd
