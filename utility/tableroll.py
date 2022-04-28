@@ -1,7 +1,7 @@
 import pandas as pd
 import random as rng
 
-## this turns the chance list into a more searchable form
+## this turns the chance list into a more searchable form, Table_Roll uses it
 def enumerator(list):
     low = int(list[0])
     high = int(list[-1])
@@ -13,13 +13,17 @@ def enumerator(list):
     return(resultlist)
         
 
+##feed this a CSV table with columns Chance, Value. It will roll on chance and return the associated value.
+
 def Table_Roll(table_name):
     #read the table
-    df_table = pd.read_csv(('utility\\rollable tables\\' + table_name + '.csv'));
-    ## the - in beyond's tables is a special character. Remove them and break any ranges into lists
-    df_table['Chance'] = df_table['Chance'].str.replace('–',' ').replace('-',' ').str.split(' ')
-    
-    ## define the outer bounds of the roll
+    df_table = pd.read_csv(('utility\\rollable tables\\' + table_name + '.csv'), encoding = 'unicode_escape');
+    ## the - in beyond's tables is a special character. Make sure it's all strings, remove any -'s, convert to arrays
+    df_table['Chance'] = df_table['Chance'].astype(str)
+    df_table['Chance'] = df_table['Chance'].str.replace('–',' ')
+    df_table['Chance'] = df_table['Chance'].str.replace('-',' ')
+    df_table['Chance'] = df_table['Chance'].str.split(' ')
+    ## define the outer bounds of the roll, this method allows for 3d6 rolls. Chance will be more random than with dice.
     table_upper = df_table.iloc[-1,0]
     table_upper = table_upper[-1]
     
@@ -42,4 +46,4 @@ def Table_Roll(table_name):
 
     
     
-##print(Table_Roll('ruler traits'));
+##print(Table_Roll('10 gp gemstones'));
