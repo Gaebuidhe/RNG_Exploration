@@ -3,8 +3,8 @@ import random as rng
 
 ## this turns the chance list into a more searchable form, Table_Roll uses it
 def enumerator(list):
-    low = int(list[0])
-    high = int(list[-1])
+    low = int(float(list[0]))
+    high = int(float(list[-1]))
     resultlist = " "
     for i in range (low,(high + 1)):
         resultlist += str(i)
@@ -20,6 +20,7 @@ def Table_Roll(table_name):
     df_table = pd.read_csv(('utility\\rollable tables\\' + table_name + '.csv'), encoding = 'unicode_escape');
     ## the - in beyond's tables is a special character. Make sure it's all strings, remove any -'s, convert to arrays
     df_table['Chance'] = df_table['Chance'].astype(str)
+    df_table['Chance'] = df_table['Chance'].str.replace('\x96',' ')
     df_table['Chance'] = df_table['Chance'].str.replace('–',' ')
     df_table['Chance'] = df_table['Chance'].str.replace('-',' ')
     df_table['Chance'] = df_table['Chance'].str.split(' ')
@@ -46,4 +47,4 @@ def Table_Roll(table_name):
 
     
     
-##print(Table_Roll('10 gp gemstones'));
+##print(Table_Roll('Blessed Radiance Effects'));
