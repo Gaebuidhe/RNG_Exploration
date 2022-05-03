@@ -6,6 +6,7 @@
 
 import pandas as pd
 import numpy as np
+from utility import terraform as tf
 
 import os
 import argparse
@@ -51,5 +52,7 @@ if args.seed is not None:
     flip_df['tid'] = tid
 
     save_csv = f'campaigns\\notes\\{args.seed}.csv'
-    flip_df.to_csv(save_csv, index=False)
+
+    tf_world_df = tf.terraform_world(flip_df)
+    tf_world_df.to_csv(save_csv, index=False)
 
