@@ -4,6 +4,8 @@ import random
 
 from utility import cartographer
 
+pd.options.mode.chained_assignment = None
+
 
 def dark_water():
     return 'ocean'
@@ -34,7 +36,7 @@ def grass(tile_neighbors):
 
 
 def rocky():
-    return 'mountain'
+    return 'mountains'
 
 
 def snowy():
@@ -62,7 +64,8 @@ def regional_tags(tile_neighbors, tid, tf_world_df):
     type_counts = tile_neighbors['Type'].value_counts()
     tid_df = tf_world_df.loc[tf_world_df['tid'] == tid]
     if " 'water'" in type_counts.keys() or " 'dark_water'" in type_counts.keys():
-        region_tags = region_tags + 'coastal'
+        if tid_df['Type'].values in [" 'dark_grass'", " 'grass'", " 'sand'", " 'rocky'", " 'snowy'"]:
+            region_tags = region_tags + 'coastal'
 
     if tid_df['Type'].item() == " 'rocky'":
         die_cast = random.randint(1, 100)
@@ -113,3 +116,25 @@ def terraform_world(world_df):
         tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'] = regional_tags(tile_neighbors, tid, tf_world_df)
 
     return tf_world_df
+
+
+def update_region_type(region_type, tid, tf_world_df):
+    tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionType'] = region_type
+    return tf_world_df
+
+
+def add_region_tags(region_tags, tid, tf_world_df):
+    new_tags = tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'].values + region_tags
+    tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'] = new_tags
+    return tf_world_df
+
+
+def delete_region_tags(region_tags, tid, tf_world_df):
+    old_tags = tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'].values
+    tags = old_tags[0].split(',')
+    remove_tags = region_tags.split(',')
+    for tag in remove_tags:
+        if tag in tags:
+            tags.remove(tag)
+
+    tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'] = tags
