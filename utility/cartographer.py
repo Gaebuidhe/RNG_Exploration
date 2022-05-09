@@ -1,6 +1,41 @@
 import pandas as pd
 import numpy as np
 
+pd.options.mode.chained_assignment = None
+
+
+def set_tiddies(raw_df, bad_rows: int, ):
+    y_values = ['DDD', 'CCC', 'BBB', 'AAA', 'ZZ', 'YY', 'XX', 'WW', 'VV', 'UU', 'TT', 'SS', 'RR', 'QQ', 'PP', 'OO',
+                'NN', 'MM', 'LL', 'KK', 'JJ', 'II', 'HH', 'GG', 'FF', 'EE', 'DD', 'CC', 'BB', 'AA', 'Z', 'Y', 'X',
+                'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'O', 'N', 'M', 'L', 'K', 'J', 'I', 'H', 'G', 'F', 'E', 'D',
+                'C', 'B', 'A']
+
+    trim_df_1 = raw_df[raw_df['Y-axis'] != 0]
+    trim_df_2 = trim_df_1
+    for i in range(bad_rows):
+        trim_df_2 = trim_df_2[trim_df_2['Y-axis'] != trim_df_2['Y-axis'].max()]
+    trim_df_3 = trim_df_2[trim_df_2['X-axis'] != trim_df_2['X-axis'].max()]
+
+    y_coords = trim_df_3['Y-axis'].unique()
+
+    flip_df = trim_df_3.iloc[::-1]
+    flip_df["Y-value"] = np.nan
+
+    for i in range(len(y_coords)):
+        flip_df['Y-value'] = np.where(flip_df['Y-axis'] == y_coords[i], y_values[i], flip_df['Y-value'])
+
+    flip_df['X-value'] = np.nan
+    x_coords = sorted(flip_df['X-axis'].unique())
+
+    for i in range(len(x_coords)):
+        flip_df['X-value'] = np.where(flip_df['X-axis'] == x_coords[-(i+1)], i+1, flip_df['X-value'])
+
+    flip_df['X-value'] = flip_df['X-value'].astype('int')
+    tid = flip_df['Y-value'] + flip_df['X-value'].astype('str')
+    flip_df['tid'] = tid
+
+    return flip_df
+
 
 def find_neighbors(tf_world_df, tid):
     y_values = ['DDD', 'CCC', 'BBB', 'AAA', 'ZZ', 'YY', 'XX', 'WW', 'VV', 'UU', 'TT', 'SS', 'RR', 'QQ', 'PP', 'OO',
@@ -52,8 +87,6 @@ def find_neighbors(tf_world_df, tid):
                 tiddies.append(vertical_neighbor + str(horizontal_neighbors[2][0]))
             else:
                 tiddies.append(vertical_neighbor + str(horizontal_neighbors[1][0]))
-
-    print(tiddies)
 
     neighbors_df = pd.DataFrame()
     for tid in tiddies:
