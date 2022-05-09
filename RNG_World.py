@@ -37,7 +37,7 @@ adjust_geo = subparser.add_parser("Adjust_Geo",
                                   help="For Adjusting geographical features of the map (i.e. Region Type or Tags)")
 adjust_geo.add_argument('-R', '--region_type', action="store", dest='region_type',
                         help="Region type to be used to update tile")
-adjust_geo.add_argument('-r', '--region_tags', action="store", dest='region_tag', help="Region tags")
+adjust_geo.add_argument('-r', '--region_tags', action="store", dest='region_tags', help="Region tags")
 adjust_geo.add_argument('-a', '--add', action="store_true", help="Add region tags to tile")
 adjust_geo.add_argument('-d', '--delete', action="store_true", help="Remove region tags from tile")
 adjust_geo.add_argument('-t', '--tid', action="store", dest='tid', help="Tile to update")
@@ -50,6 +50,7 @@ if args.seed is not None:
     raw_df = pd.read_csv(seed_location)
     flip_df = cg.set_tiddies(raw_df, 5)
 
+    # full build logic
     if args.utility == 'Full_Build':
         if args.all or args.geographical:
             terraform_csv = f'campaigns\\notes\\{args.seed}_geographical.csv'
@@ -59,19 +60,36 @@ if args.seed is not None:
         if args.all or args.political:
             political_csv = f'campaigns\\notes\\{args.seed}_political.csv'
 
+    # Adjust geographic features logic
     if args.utility == 'Adjust_Geo':
         print(args)
         region_type_list = ['ocean', 'sea', 'lake', 'desert', 'hills', 'grasslands', 'mountains', 'arctic', 'swamp',
                             'forest']
         geo_csv = f'campaigns\\notes\\{args.seed}_geographical.csv'
         tf_world_df = pd.read_csv(geo_csv)
+        updated_world_df = pd.DataFrame()
 
         while args.tid is None:
             args.tid = input("Please Enter TID (i.e. DD20):")
+
+        args.tid = args.tid.capitalize()
 
         if args.region_type is not None:
             while args.region_type not in region_type_list:
                 args.region_type = input(f'Please use one of the following Region Types: {region_type_list}\n')
 
             updated_world_df = tf.update_region_type(args.region_type, args.tid, tf_world_df)
+            geo_csv = f'campaigns\\notes\\{args.seed}_geographical.csv'
+            updated_world_df.to_csv(geo_csv, index=False)
 
+        if args.region_tags is not None:
+            if args.add:
+                updated_world_df = tf.add_region_tags(args.region_tags, args.tid, tf_world_df)
+                geo_csv = f'campaigns\\notes\\{args.seed}_geographical.csv'
+                updated_world_df.to_csv(geo_csv, index=False)
+            elif args.delete:
+                updated_world_df = tf.delete_region_tags(args.region_tags, args.tid, tf_world_df)
+                geo_csv = f'campaigns\\notes\\{args.seed}_geographical.csv'
+                updated_world_df.to_csv(geo_csv, index=False)
+            else:
+                print(tf_world_df.loc[tf_world_df['tid'] == args.tid])

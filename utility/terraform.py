@@ -85,8 +85,8 @@ def regional_tags(tile_neighbors, tid, tf_world_df):
 
 def terraform_world(world_df):
     tf_world_df = world_df
-    tf_world_df['RegionType'] = np.nan
-    tf_world_df['RegionTags'] = np.nan
+    tf_world_df['RegionType'] = ''
+    tf_world_df['RegionTags'] = ''
     for tid in tf_world_df['tid']:
         tile_neighbors = cartographer.find_neighbors(tf_world_df, tid)
         type_value = tf_world_df.loc[tf_world_df['tid'] == tid, 'Type'].values
@@ -119,22 +119,31 @@ def terraform_world(world_df):
 
 
 def update_region_type(region_type, tid, tf_world_df):
-    tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionType'] = region_type
-    return tf_world_df
+    update_df = tf_world_df
+    update_df.loc[update_df['tid'] == tid, 'RegionType'] = region_type
+    return update_df
 
 
 def add_region_tags(region_tags, tid, tf_world_df):
-    new_tags = tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'].values + region_tags
-    tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'] = new_tags
-    return tf_world_df
+    update_df = tf_world_df
+    current_tags = update_df.loc[update_df['tid'] == tid, 'RegionTags'].values[0]
+    if current_tags == '':
+        new_tags = region_tags
+    else:
+        new_tags = current_tags + ',' + region_tags
+    update_df.loc[update_df['tid'] == tid, 'RegionTags'] = new_tags
+    return update_df
 
 
 def delete_region_tags(region_tags, tid, tf_world_df):
-    old_tags = tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'].values
+    update_df = tf_world_df
+    old_tags = update_df.loc[update_df['tid'] == tid, 'RegionTags'].values
     tags = old_tags[0].split(',')
     remove_tags = region_tags.split(',')
     for tag in remove_tags:
         if tag in tags:
             tags.remove(tag)
 
-    tf_world_df.loc[tf_world_df['tid'] == tid, 'RegionTags'] = tags
+    new_tags = ','.join(tags)
+    update_df.loc[update_df['tid'] == tid, 'RegionTags'] = new_tags
+    return update_df
