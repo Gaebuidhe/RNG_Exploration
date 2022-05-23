@@ -7,8 +7,10 @@ from utility import cartographer
 pd.options.mode.chained_assignment = None
 
 
+
 def dark_water():
     return 'ocean'
+
 
 
 def light_water(tile_neighbors):
@@ -83,12 +85,15 @@ def regional_tags(tile_neighbors, tid, tf_world_df):
     return region_tags
 
 
+
 def terraform_world(world_df):
     tf_world_df = world_df
     tf_world_df['RegionType'] = ''
     tf_world_df['RegionTags'] = ''
     for tid in tf_world_df['tid']:
+
         tile_neighbors = cartographer.find_neighbors(tf_world_df, tid)
+
         type_value = tf_world_df.loc[tf_world_df['tid'] == tid, 'Type'].values
         tile_type = type_value[0][2:-1]
 
@@ -147,3 +152,4 @@ def delete_region_tags(region_tags, tid, tf_world_df):
     new_tags = ','.join(tags)
     update_df.loc[update_df['tid'] == tid, 'RegionTags'] = new_tags
     return update_df
+

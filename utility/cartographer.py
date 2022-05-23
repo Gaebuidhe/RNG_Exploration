@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+
 pd.options.mode.chained_assignment = None
 
 
@@ -35,6 +36,7 @@ def set_tiddies(raw_df, bad_rows: int, ):
     flip_df['tid'] = tid
 
     return flip_df
+
 
 
 def find_neighbors(tf_world_df, tid):
@@ -93,3 +95,4 @@ def find_neighbors(tf_world_df, tid):
         neighbors_df = pd.concat([neighbors_df, tf_world_df.loc[tf_world_df['tid'] == tid]], ignore_index=True)
 
     return neighbors_df
+
