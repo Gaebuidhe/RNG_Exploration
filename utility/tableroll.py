@@ -106,4 +106,4 @@ def Table_Roll(table_name):
 
     
     
-print(RollCheck("d6-1"));
+##print(RollCheck("d6-1 (2)"));
